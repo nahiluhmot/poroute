@@ -1,3 +1,4 @@
+require 'poroute/path_segment'
 require 'poroute/version'
 
 module Poroute
