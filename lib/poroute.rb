@@ -1,3 +1,4 @@
+require 'poroute/definition'
 require 'poroute/path_segment'
 require 'poroute/segment_tree'
 require 'poroute/version'

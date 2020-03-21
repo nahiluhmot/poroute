@@ -1,4 +1,9 @@
 require 'bundler/setup'
+require 'json'
+require 'securerandom'
+
+require 'pry'
+
 require 'poroute'
 
 RSpec.configure do |config|
