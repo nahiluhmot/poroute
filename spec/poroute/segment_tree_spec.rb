@@ -1,28 +1,28 @@
 RSpec.describe Poroute::SegmentTree do
-  describe '#match' do
-    subject do
-      described_class
-        .new
-        .insert(
-          Poroute::PathSegment.parse('/very/very/specific/path'),
-          :specific
-        )
-        .insert(
-          Poroute::PathSegment.parse('/pages/:page/item'),
-          :pages_visit_item
-        )
-        .insert(
-          Poroute::PathSegment.parse('/prefix/*suffix'),
-          :pages_not_found
-        )
-        .insert(
-          Poroute::PathSegment.parse(
-            '/crazy/*first_wild_card/pizza/:bind/*second_wild_card'
-          ),
-          :crazy
-        )
-    end
+  subject do
+    described_class
+      .new
+      .insert(
+        Poroute::PathSegment.parse('/very/very/specific/path'),
+        :specific
+      )
+      .insert(
+        Poroute::PathSegment.parse('/pages/:page/item'),
+        :pages_visit_item
+      )
+      .insert(
+        Poroute::PathSegment.parse('/prefix/*suffix'),
+        :pages_not_found
+      )
+      .insert(
+        Poroute::PathSegment.parse(
+          '/crazy/*first_wild_card/pizza/:bind/*second_wild_card'
+        ),
+        :crazy
+      )
+  end
 
+  describe '#match' do
     context 'when there is no match' do
       let(:bad_paths) do
         [
@@ -219,6 +219,51 @@ RSpec.describe Poroute::SegmentTree do
           )
         )
       )
+    end
+  end
+
+  describe '#to_a' do
+    let(:expected) do
+      [
+        [
+          [
+            Poroute::PathSegment::MatchString.new('very'),
+            Poroute::PathSegment::MatchString.new('very'),
+            Poroute::PathSegment::MatchString.new('specific'),
+            Poroute::PathSegment::MatchString.new('path')
+          ],
+          :specific
+        ],
+        [
+          [
+            Poroute::PathSegment::MatchString.new('pages'),
+            Poroute::PathSegment::BindSegment.new('page'),
+            Poroute::PathSegment::MatchString.new('item')
+          ],
+          :pages_visit_item
+        ],
+        [
+          [
+            Poroute::PathSegment::MatchString.new('prefix'),
+            Poroute::PathSegment::BindWildCard.new('suffix')
+          ],
+          :pages_not_found
+        ],
+        [
+          [
+            Poroute::PathSegment::MatchString.new('crazy'),
+            Poroute::PathSegment::BindWildCard.new('first_wild_card'),
+            Poroute::PathSegment::MatchString.new('pizza'),
+            Poroute::PathSegment::BindSegment.new('bind'),
+            Poroute::PathSegment::BindWildCard.new('second_wild_card')
+          ],
+          :crazy
+        ]
+      ]
+    end
+
+    it 'returns each mapping' do
+      expect(subject.to_a).to eq(expected)
     end
   end
 end

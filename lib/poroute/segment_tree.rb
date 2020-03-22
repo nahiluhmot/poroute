@@ -2,6 +2,8 @@ module Poroute
   # Stores values keyed by many PathSegments. Lookups are done with path parts
   # (i.e. the path of HTTP requests, split on "/").
   class SegmentTree
+    include Enumerable
+
     Node = Struct.new(:value, :exact_matches, :binds, :wild_cards)
     Match = Struct.new(:value, :params)
 
@@ -33,11 +35,52 @@ module Poroute
       SegmentTree.new(new_root)
     end
 
+    def each(&block)
+      return enum_for(:each) unless block
+
+      each_value_with_prefix(@root, [], &block)
+
+      self
+    end
+
     protected
 
     attr_reader :root
 
     private
+
+    def each_value_with_prefix(node, prefix, &block)
+      block.call(prefix, node.value) if node.value
+
+      each_child_value_with_prefix(
+        node.exact_matches,
+        prefix,
+        PathSegment::MatchString,
+        &block
+      )
+
+      each_child_value_with_prefix(
+        node.binds,
+        prefix,
+        PathSegment::BindSegment,
+        &block
+      )
+
+      each_child_value_with_prefix(
+        node.wild_cards,
+        prefix,
+        PathSegment::BindWildCard,
+        &block
+      )
+    end
+
+    def each_child_value_with_prefix(children, prefix, klass, &block)
+      children.each do |key, child_node|
+        new_prefix = [*prefix, klass.new(key)]
+
+        each_value_with_prefix(child_node, new_prefix, &block)
+      end
+    end
 
     def match_node(path_parts, params, node)
       if path_parts.empty?
