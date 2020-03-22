@@ -44,6 +44,20 @@ module Poroute
         end
     end
 
+    protected
+
+    def prepend_middleware(new_middleware)
+      with(middleware: new_middleware + @middleware)
+    end
+
+    def with_controller_unless_present(new_controller)
+      if @controller
+        self
+      else
+        controller(new_controller)
+      end
+    end
+
     private
 
     def routes_segment_trees_by_method
@@ -61,6 +75,8 @@ module Poroute
     def mounts_segment_trees_by_method
       @mounts.map do |(prefix, definition)|
         definition
+          .with_controller_unless_present(@controller)
+          .prepend_middleware(@middleware)
           .segment_trees_by_method
           .transform_values { |tree| tree.add_prefix(prefix) }
       end

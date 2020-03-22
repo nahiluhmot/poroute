@@ -172,7 +172,7 @@ RSpec.describe Poroute::App do
         }
       end
       let(:expected) do
-        [404, {}, ['Unable to route nested/miss']]
+        [404, {}, ['Unable to route nested/miss'.reverse]]
       end
 
       it 'returns the default response' do
@@ -218,17 +218,17 @@ RSpec.describe Poroute::App do
 
       it 'returns the default response' do
         expect(subject.call(index_env))
-          .to eq([200, { 'Content-Type' => 'application/json' }, ['[]']])
+          .to eq([200, { 'Content-Type' => 'application/json' }, ['][']])
 
         expect(subject.call(read_env))
-          .to eq([404, {}, ['Unable to find pasta gnocchi']])
+          .to eq([404, {}, ['Unable to find pasta gnocchi'.reverse]])
 
         expect(subject.call(create_env)).to(
           eq(
             [
               200,
               { 'Content-Type' => 'application/json' },
-              ['{"name":"gnocchi","rating":"10/10"}']
+              ['{"name":"gnocchi","rating":"10/10"}'.reverse]
             ]
           )
         )
@@ -238,7 +238,7 @@ RSpec.describe Poroute::App do
             [
               200,
               { 'Content-Type' => 'application/json' },
-              ['[{"name":"gnocchi","rating":"10/10"}]']
+              ['[{"name":"gnocchi","rating":"10/10"}]'.reverse]
             ]
           )
         )
@@ -248,7 +248,7 @@ RSpec.describe Poroute::App do
             [
               200,
               { 'Content-Type' => 'application/json' },
-              ['{"name":"gnocchi","rating":"10/10"}']
+              ['{"name":"gnocchi","rating":"10/10"}'.reverse]
             ]
           )
         )
@@ -257,10 +257,10 @@ RSpec.describe Poroute::App do
           .to eq([204, {}, []])
 
         expect(subject.call(index_env))
-          .to eq([200, { 'Content-Type' => 'application/json' }, ['[]']])
+          .to eq([200, { 'Content-Type' => 'application/json' }, ['][']])
 
         expect(subject.call(read_env))
-          .to eq([404, {}, ['Unable to find pasta gnocchi']])
+          .to eq([404, {}, ['Unable to find pasta gnocchi'.reverse]])
       end
     end
   end
