@@ -118,8 +118,9 @@ RSpec.describe Poroute::Definition do
   def dispatch_route(method, path, headers: {}, body: nil)
     parts = path.split('/').reject(&:empty?)
     match = segment_trees_by_method[method].match(parts)
+    _, _, handler = match.value
 
-    match.value.call(
+    handler.call(
       method: method,
       path: path,
       headers: headers,

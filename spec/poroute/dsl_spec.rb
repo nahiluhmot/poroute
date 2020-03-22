@@ -40,7 +40,8 @@ RSpec.describe Poroute::Dsl do
         .segment_trees_by_method['GET']
         .match(%w[users first])
 
-      response = match.value.call(params: match.params)
+      _, _, handler = match.value
+      response = handler.call(params: match.params)
 
       expect(response).to(
         eq(

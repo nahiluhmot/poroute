@@ -9,7 +9,14 @@ module Poroute
     end
 
     def controller(new_controller)
-      with(controller: new_controller)
+      instance =
+        if new_controller.is_a?(Class)
+          new_controller.new
+        else
+          new_controller
+        end
+
+      with(controller: instance)
     end
 
     def on(method, path_segments, action)
@@ -46,7 +53,7 @@ module Poroute
           routes.reduce(SegmentTree.new) do |tree, (_, path_segments, action)|
             route_handler = build_route_handler(action)
 
-            tree.insert(path_segments, route_handler)
+            tree.insert(path_segments, [@controller, action, route_handler])
           end
         end
     end

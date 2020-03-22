@@ -24,15 +24,20 @@ module Poroute
     def routes
       @segment_trees_by_method
         .flat_map { |method, tree| segment_tree_routes(method, tree) }
-        .sort_by { |(_, path)| path }
+        .sort_by { |hash| hash[:path] }
     end
 
     private
 
     def segment_tree_routes(method, segment_tree)
-      segment_tree
-        .map { |prefix, _| PathSegment.serialize(prefix) }
-        .map { |path| [method, path] }
+      segment_tree.map do |prefix, (controller, action, _)|
+        {
+          method: method,
+          path: PathSegment.serialize(prefix),
+          controller: controller,
+          action: action
+        }
+      end
     end
 
     def try_route_request(env)
@@ -46,7 +51,7 @@ module Poroute
 
         if (match = segment_tree.match(path_parts))
           params = match.params
-          route_handler = match.value
+          _, _, route_handler = match.value
 
           headers = env
             .select { |key, _| key.start_with?(HEADER_PREFIX) }

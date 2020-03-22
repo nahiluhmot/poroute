@@ -269,18 +269,53 @@ RSpec.describe Poroute::App do
     let(:routes) { subject.routes }
     let(:expected) do
       [
-        %w[GET /],
-        %w[GET /about],
-        %w[GET /app/*match],
-        %w[GET /app/pasta],
-        %w[POST /app/pasta],
-        %w[GET /app/pasta/:slug],
-        %w[DELETE /app/pasta/:slug]
+        {
+          method: 'GET',
+          path: '/',
+          controller: instance_of(root_controller),
+          action: :index
+        },
+        {
+          method: 'GET',
+          path: '/about',
+          controller: instance_of(root_controller),
+          action: :about
+        },
+        {
+          method: 'GET',
+          path: '/app/*match',
+          controller: instance_of(app_controller),
+          action: :not_found
+        },
+        {
+          method: 'GET',
+          path: '/app/pasta',
+          controller: instance_of(pasta_controller),
+          action: :index
+        },
+        {
+          method: 'POST',
+          path: '/app/pasta',
+          controller: instance_of(pasta_controller),
+          action: :create
+        },
+        {
+          method: 'GET',
+          path: '/app/pasta/:slug',
+          controller: instance_of(pasta_controller),
+          action: :read
+        },
+        {
+          method: 'DELETE',
+          path: '/app/pasta/:slug',
+          controller: instance_of(pasta_controller),
+          action: :destroy
+        }
       ]
     end
 
     it 'returns the routes' do
-      expect(subject.routes).to eq(routes)
+      expect(subject.routes).to match(expected)
     end
   end
 end

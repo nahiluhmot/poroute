@@ -21,6 +21,8 @@ module Poroute
     end
 
     def serialize(segments)
+      return '/' if segments.empty?
+
       segments
         .map(&method(:serialize_segment))
         .join
