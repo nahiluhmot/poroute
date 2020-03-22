@@ -20,6 +20,12 @@ module Poroute
         .map(&method(:parse_segment))
     end
 
+    def serialize(segments)
+      segments
+        .map(&method(:serialize_segment))
+        .join
+    end
+
     def parse_segment(segment)
       if segment.start_with?(BIND_SEGMENT_PREFIX)
         BindSegment.new(segment[1..-1])
@@ -27,6 +33,17 @@ module Poroute
         BindWildCard.new(segment[1..-1])
       else
         MatchString.new(segment)
+      end
+    end
+
+    def serialize_segment(segment)
+      case segment
+      when PathSegment::MatchString
+        "/#{segment.string}"
+      when PathSegment::BindSegment
+        "/:#{segment.string}"
+      when PathSegment::BindWildCard
+        "/*#{segment.string}"
       end
     end
   end
