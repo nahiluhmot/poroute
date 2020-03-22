@@ -21,7 +21,6 @@ RSpec.describe Poroute::Dsl do
       end
     end
 
-
     let(:users_controller) do
       Class.new do
         def read(params:)
